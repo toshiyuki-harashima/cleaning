@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabiq清掃管理画面 - スタッフ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            padding: 0;
+            color: #333;
+        }
+
+        .header {
+            background-color: #fff;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .hotel-selector {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            font-size: 16px;
+            color: #333;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+            margin-bottom: 12px;
+        }
+
+        .view-toggle {
+            display: flex;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #f8f9fa;
+        }
+
+        .view-btn {
+            flex: 1;
+            background-color: transparent;
+            border: none;
+            padding: 12px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.2s ease;
+        }
+
+        .view-btn.active {
+            background-color: #2196f3;
+            color: white;
+        }
+
+        .date-navigation {
+            background-color: #fff;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .date-nav-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #666;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .current-date {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .staff-info {
+            background-color: #fff;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            text-align: center;
+        }
+
+        .staff-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .progress-info {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .progress-bar {
+            background-color: #e0e0e0;
+            height: 8px;
+            border-radius: 4px;
+            margin: 12px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background-color: #8bc34a;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .room-list {
+            padding: 20px;
+        }
+
+        .room-card {
+            background-color: #fff;
+            border: 2px solid #8bc34a;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            padding: 20px;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .room-card.out-cleaning {
+            border-color: #ff5722;
+            background-color: #fff5f5;
+        }
+
+        .room-card.in-progress {
+            border-color: #ff9800;
+            background-color: #fff9f0;
+        }
+
+        .room-card.cleaned {
+            border-color: #2196f3;
+            background-color: #f3f9ff;
+        }
+
+        .room-card.inspected {
+            border-color: #8bc34a;
+            background-color: #f8fff8;
+        }
+
+        .room-card.dd-stay {
+            border-color: #9c27b0;
+            background-color: #faf5ff;
+        }
+
+        /* 担当状況による表示区別 */
+        .room-card.my-assignment {
+            border-width: 3px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .room-card.unassigned {
+            opacity: 0.7;
+            border-style: dashed;
+            background-color: #f9f9f9;
+        }
+
+        .room-card.other-assignment {
+            opacity: 0.5;
+            background-color: #f5f5f5;
+        }
+
+        .assignment-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .assignment-badge.my {
+            background-color: #2196f3;
+            color: white;
+        }
+
+        .assignment-badge.unassigned {
+            background-color: #ff9800;
+            color: white;
+        }
+
+        .assignment-badge.other {
+            background-color: #757575;
+            color: white;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .room-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .room-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .status-text {
+            font-size: 14px;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-weight: 500;
+        }
+
+        .status-text.out-cleaning {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+
+        .status-text.in-progress {
+            background-color: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .status-text.cleaned {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-text.inspected {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .status-text.dd-stay {
+            background-color: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .check-in-time {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-start {
+            background-color: #2196f3;
+            color: white;
+        }
+
+        .btn-start:hover {
+            background-color: #1976d2;
+        }
+
+        .btn-finish {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .btn-finish:hover {
+            background-color: #388e3c;
+        }
+
+
+        .btn:disabled {
+            background-color: #e0e0e0;
+            color: #9e9e9e;
+            cursor: not-allowed;
+        }
+
+        .room-time {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .floating-summary {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background-color: #fff;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 1px solid #e0e0e0;
+        }
+
+        .summary-text {
+            text-align: center;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .remaining-time {
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: #2196f3;
+        }
+
+        @media (max-width: 480px) {
+            .room-list {
+                padding: 16px;
+            }
+            
+            .room-card {
+                padding: 16px;
+            }
+            
+            .room-number {
+                font-size: 20px;
+            }
+            
+            .btn {
+                padding: 14px;
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="header-title">Tabiq清掃管理画面 - スタッフ</div>
+        </div>
+        <select class="hotel-selector" id="hotelSelector">
+            <option value="1">ホテル桜 新宿店</option>
+            <option value="2">ホテル桜 渋谷店</option>
+            <option value="3">ホテル桜 池袋店</option>
+        </select>
+        
+        <div class="view-toggle">
+            <button class="view-btn active" data-view="assigned">担当部屋のみ</button>
+            <button class="view-btn" data-view="all">全部屋表示</button>
+        </div>
+    </div>
+
+    <div class="date-navigation">
+        <button class="date-nav-btn">‹</button>
+        <div class="current-date">2025年08月19日</div>
+        <button class="date-nav-btn">›</button>
+    </div>
+
+    <div class="staff-info">
+        <div class="staff-name">田中 花子</div>
+        <div class="progress-info">完了: 2部屋 / 5部屋</div>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 40%"></div>
+        </div>
+    </div>
+
+    <div class="room-list">
+        <!-- 清掃中の部屋（自分の担当） -->
+        <div class="room-card in-progress my-assignment">
+            <div class="assignment-badge my">担当</div>
+            <div class="room-number">102</div>
+            <div class="room-status">
+                <span class="status-text in-progress">清掃中</span>
+                <span class="check-in-time">IN: 15:00</span>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-finish">FINISH</button>
+            </div>
+            <div class="room-time">開始時刻: 10:30</div>
+        </div>
+
+        <!-- 清掃済の部屋（自分の担当） -->
+        <div class="room-card cleaned my-assignment">
+            <div class="assignment-badge my">担当</div>
+            <div class="room-number">104</div>
+            <div class="room-status">
+                <span class="status-text cleaned">清掃済</span>
+                <span class="check-in-time">IN: 15:00</span>
+            </div>
+            <div class="action-buttons">
+                <button class="btn" disabled>点検待ち</button>
+            </div>
+            <div class="room-time">完了時刻: 11:20</div>
+        </div>
+
+        <!-- アウト清掃の部屋（自分の担当） -->
+        <div class="room-card out-cleaning my-assignment">
+            <div class="assignment-badge my">担当</div>
+            <div class="room-number">201</div>
+            <div class="room-status">
+                <span class="status-text out-cleaning">アウト清掃</span>
+                <span class="check-in-time">IN: 15:00</span>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-start">START</button>
+            </div>
+        </div>
+
+        <!-- アウト清掃の部屋（自分の担当） -->
+        <div class="room-card out-cleaning my-assignment">
+            <div class="assignment-badge my">担当</div>
+            <div class="room-number">103</div>
+            <div class="room-status">
+                <span class="status-text out-cleaning">アウト清掃</span>
+                <span class="check-in-time">IN: 18:00</span>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-start">START</button>
+            </div>
+        </div>
+
+        <!-- 未アサインの部屋 -->
+        <div class="room-card out-cleaning unassigned hidden">
+            <div class="assignment-badge unassigned">未割当</div>
+            <div class="room-number">105</div>
+            <div class="room-status">
+                <span class="status-text out-cleaning">アウト清掃</span>
+                <span class="check-in-time">IN: 16:00</span>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-start" onclick="takeRoom(this)">受け取る</button>
+            </div>
+        </div>
+
+        <!-- 他スタッフ担当の部屋 -->
+        <div class="room-card out-cleaning other-assignment hidden">
+            <div class="assignment-badge other">佐藤担当</div>
+            <div class="room-number">106</div>
+            <div class="room-status">
+                <span class="status-text out-cleaning">アウト清掃</span>
+                <span class="check-in-time">IN: 18:00</span>
+            </div>
+            <div class="action-buttons">
+                <button class="btn" disabled>他スタッフ担当</button>
+            </div>
+        </div>
+
+        <!-- 他スタッフ担当の部屋（点検済） -->
+        <div class="room-card inspected other-assignment hidden">
+            <div class="assignment-badge other">山田担当</div>
+            <div class="room-number">107</div>
+            <div class="room-status">
+                <span class="status-text inspected">点検済</span>
+                <span class="check-in-time">IN: 17:00</span>
+            </div>
+            <div class="action-buttons">
+                <button class="btn" disabled>受け入れ可</button>
+            </div>
+            <div class="room-time">点検完了: 12:45</div>
+        </div>
+
+        <!-- DD（連泊）の部屋 -->
+        <div class="room-card dd-stay other-assignment hidden">
+            <div class="assignment-badge other">連泊</div>
+            <div class="room-number">108</div>
+            <div class="room-status">
+                <span class="status-text dd-stay">DD</span>
+                <span class="check-in-time">連泊2日目</span>
+            </div>
+            <div class="action-buttons">
+                <button class="btn" disabled>清掃不要</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="floating-summary">
+        <div class="summary-text">残り3部屋（予想完了時刻）</div>
+        <div class="remaining-time">14:30</div>
+    </div>
+
+    <script>
+        // STARTボタンイベントを追加する関数
+        function addStartEvent(btn) {
+            btn.addEventListener('click', function() {
+                if (confirm('清掃を開始しますか？')) {
+                    const card = this.closest('.room-card');
+                    card.className = 'room-card in-progress my-assignment';
+                    card.querySelector('.status-text').className = 'status-text in-progress';
+                    card.querySelector('.status-text').textContent = '清掃中';
+                    
+                    const buttons = card.querySelector('.action-buttons');
+                    buttons.innerHTML = `
+                        <button class="btn btn-finish">FINISH</button>
+                    `;
+                    
+                    // 新しいボタンにイベント追加
+                    addFinishEvent(buttons.querySelector('.btn-finish'));
+                    
+                    // 開始時刻を追加
+                    const now = new Date();
+                    const timeText = card.querySelector('.room-time') || document.createElement('div');
+                    timeText.className = 'room-time';
+                    timeText.textContent = `開始時刻: ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+                    card.appendChild(timeText);
+                    
+                    updateProgress();
+                }
+            });
+        }
+
+        // 既存のSTARTボタンにイベントを追加
+        document.querySelectorAll('.btn-start').forEach(btn => {
+            addStartEvent(btn);
+        });
+
+        function addFinishEvent(btn) {
+            btn.addEventListener('click', function() {
+                if (confirm('清掃を完了しますか？')) {
+                    const card = this.closest('.room-card');
+                    card.className = 'room-card cleaned my-assignment';
+                    card.querySelector('.status-text').className = 'status-text cleaned';
+                    card.querySelector('.status-text').textContent = '清掃済';
+                    
+                    const buttons = card.querySelector('.action-buttons');
+                    buttons.innerHTML = '<button class="btn" disabled>点検待ち</button>';
+                    
+                    // 完了時刻を更新
+                    const now = new Date();
+                    const timeText = card.querySelector('.room-time');
+                    timeText.textContent = `完了時刻: ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+                    
+                    updateProgress();
+                }
+            });
+        }
+
+        // 初期化時に既存のfinishボタンにイベント追加
+        document.querySelectorAll('.btn-finish').forEach(btn => {
+            addFinishEvent(btn);
+        });
+
+
+        function updateProgress() {
+            const totalRooms = document.querySelectorAll('.room-card').length;
+            const completedRooms = document.querySelectorAll('.room-card.completed').length;
+            const progressPercent = (completedRooms / totalRooms) * 100;
+            
+            document.querySelector('.progress-info').textContent = `完了: ${completedRooms}部屋 / ${totalRooms}部屋`;
+            document.querySelector('.progress-fill').style.width = `${progressPercent}%`;
+            
+            const remaining = totalRooms - completedRooms;
+            document.querySelector('.summary-text').textContent = `残り${remaining}部屋（予想完了時刻）`;
+        }
+
+        // 表示モード切り替え機能
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // ボタンの状態を更新
+                document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const viewMode = this.dataset.view;
+                toggleRoomView(viewMode);
+            });
+        });
+
+        function toggleRoomView(mode) {
+            const allRooms = document.querySelectorAll('.room-card');
+            const myRooms = document.querySelectorAll('.room-card.my-assignment');
+            const otherRooms = document.querySelectorAll('.room-card.unassigned, .room-card.other-assignment');
+            
+            if (mode === 'assigned') {
+                // 担当部屋のみ表示
+                myRooms.forEach(room => room.classList.remove('hidden'));
+                otherRooms.forEach(room => room.classList.add('hidden'));
+            } else {
+                // 全部屋表示
+                allRooms.forEach(room => room.classList.remove('hidden'));
+            }
+            
+            updateProgress();
+        }
+
+        // 緊急時の部屋受け取り機能
+        function takeRoom(button) {
+            const roomCard = button.closest('.room-card');
+            const roomNumber = roomCard.querySelector('.room-number').textContent;
+            
+            if (confirm(`部屋${roomNumber}を担当に追加しますか？\n\n※管理者に通知されます`)) {
+                // 担当に変更
+                roomCard.classList.remove('unassigned');
+                roomCard.classList.add('my-assignment');
+                
+                // バッジを更新
+                const badge = roomCard.querySelector('.assignment-badge');
+                badge.className = 'assignment-badge my';
+                badge.textContent = '担当';
+                
+                // ボタンを更新
+                button.textContent = 'START';
+                button.onclick = null;
+                button.classList.add('btn-start');
+                
+                // 既存のSTARTボタンイベントを追加
+                addStartEvent(button);
+                
+                // 進捗を更新
+                updateProgress();
+                
+                // 実際の実装では、サーバーに担当変更を通知
+                console.log(`部屋${roomNumber}を担当に追加しました`);
+            }
+        }
+
+        // 施設選択の処理
+        document.getElementById('hotelSelector').addEventListener('change', function() {
+            const selectedHotel = this.options[this.selectedIndex].text;
+            console.log('施設変更:', selectedHotel);
+            
+            // デモ用：部屋データの更新シミュレーション
+            updateRoomDataForHotel(this.value);
+        });
+
+        function updateRoomDataForHotel(hotelId) {
+            // 実際の実装では、APIから施設ごとの部屋データを取得
+            const hotelNames = {
+                '1': '新宿店',
+                '2': '渋谷店', 
+                '3': '池袋店',
+            };
+            
+            // スタッフ名も施設に応じて変更
+            const staffName = document.querySelector('.staff-name');
+            staffName.textContent = `田中 花子 (${hotelNames[hotelId]})`;
+            
+            console.log(`${hotelNames[hotelId]}のデータに更新しました`);
+        }
+    </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabiq清掃管理画面 - スタッフ</title>
+    <title>Tabiq清掃管理 - スタッフ</title>
     <style>
         * {
             margin: 0;
@@ -22,9 +22,14 @@
             background-color: #fff;
             padding: 16px 20px;
             border-bottom: 1px solid #e0e0e0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+        }
+
+        @media (min-width: 769px) {
+            .header {
+                position: sticky;
+                top: 0;
+                z-index: 100;
+            }
         }
 
         .header-content {
@@ -38,6 +43,85 @@
             font-size: 18px;
             font-weight: 600;
             color: #333;
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-button {
+            background: none;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #333;
+            transition: all 0.2s ease;
+        }
+
+        .user-button:hover {
+            background-color: #f5f5f5;
+        }
+
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            min-width: 200px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .user-dropdown.open {
+            display: block;
+        }
+
+        .user-info {
+            padding: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .dropdown-menu {
+            padding: 8px 0;
+        }
+
+        .dropdown-item {
+            display: block;
+            width: 100%;
+            padding: 8px 16px;
+            border: none;
+            background: none;
+            text-align: left;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f5f5f5;
         }
 
         .hotel-selector {
@@ -63,18 +147,6 @@
             border-radius: 8px;
             overflow: hidden;
             background-color: #f8f9fa;
-        }
-
-        .view-btn {
-            flex: 1;
-            background-color: transparent;
-            border: none;
-            padding: 12px 16px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            color: #666;
-            transition: all 0.2s ease;
         }
 
         .view-btn.active {
@@ -230,6 +302,18 @@
             font-weight: bold;
             color: #333;
             margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .room-type {
+            font-size: 14px;
+            color: #666;
+            background-color: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: normal;
         }
 
         .room-status {
@@ -372,39 +456,34 @@
 <body>
     <div class="header">
         <div class="header-content">
-            <div class="header-title">Tabiq清掃管理画面 - スタッフ</div>
+            <div class="header-title">Tabiq清掃管理 - スタッフ</div>
+            <div class="user-menu">
+                <button class="user-button" onclick="toggleUserMenu()">
+                    <span>▼</span>
+                </button>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="user-info">
+                        <div class="user-name">田中 花子</div>
+                        <div class="user-role">清掃スタッフ</div>
+                    </div>
+                    <div class="dropdown-menu">
+                        <button class="dropdown-item" style="color: #c62828;">ログアウト</button>
+                    </div>
+                </div>
+            </div>
         </div>
         <select class="hotel-selector" id="hotelSelector">
             <option value="1">ホテル桜 新宿店</option>
             <option value="2">ホテル桜 渋谷店</option>
             <option value="3">ホテル桜 池袋店</option>
         </select>
-        
-        <div class="view-toggle">
-            <button class="view-btn active" data-view="assigned">担当部屋のみ</button>
-            <button class="view-btn" data-view="all">全部屋表示</button>
-        </div>
-    </div>
-
-    <div class="date-navigation">
-        <button class="date-nav-btn">‹</button>
-        <div class="current-date">2025年08月19日</div>
-        <button class="date-nav-btn">›</button>
-    </div>
-
-    <div class="staff-info">
-        <div class="staff-name">田中 花子</div>
-        <div class="progress-info">完了: 2部屋 / 5部屋</div>
-        <div class="progress-bar">
-            <div class="progress-fill" style="width: 40%"></div>
-        </div>
     </div>
 
     <div class="room-list">
         <!-- 清掃中の部屋（自分の担当） -->
         <div class="room-card in-progress my-assignment">
             <div class="assignment-badge my">担当</div>
-            <div class="room-number">102</div>
+            <div class="room-number">102 <span class="room-type">シングル</span></div>
             <div class="room-status">
                 <span class="status-text in-progress">清掃中</span>
                 <span class="check-in-time">IN: 15:00</span>
@@ -412,13 +491,12 @@
             <div class="action-buttons">
                 <button class="btn btn-finish">FINISH</button>
             </div>
-            <div class="room-time">開始時刻: 10:30</div>
         </div>
 
         <!-- 清掃済の部屋（自分の担当） -->
         <div class="room-card cleaned my-assignment">
             <div class="assignment-badge my">担当</div>
-            <div class="room-number">104</div>
+            <div class="room-number">104 <span class="room-type">ダブル</span></div>
             <div class="room-status">
                 <span class="status-text cleaned">清掃済</span>
                 <span class="check-in-time">IN: 15:00</span>
@@ -426,13 +504,12 @@
             <div class="action-buttons">
                 <button class="btn" disabled>点検待ち</button>
             </div>
-            <div class="room-time">完了時刻: 11:20</div>
         </div>
 
         <!-- アウト清掃の部屋（自分の担当） -->
         <div class="room-card out-cleaning my-assignment">
             <div class="assignment-badge my">担当</div>
-            <div class="room-number">201</div>
+            <div class="room-number">201 <span class="room-type">シングル</span></div>
             <div class="room-status">
                 <span class="status-text out-cleaning">アウト清掃</span>
                 <span class="check-in-time">IN: 15:00</span>
@@ -445,7 +522,7 @@
         <!-- アウト清掃の部屋（自分の担当） -->
         <div class="room-card out-cleaning my-assignment">
             <div class="assignment-badge my">担当</div>
-            <div class="room-number">103</div>
+            <div class="room-number">103 <span class="room-type">ツイン</span></div>
             <div class="room-status">
                 <span class="status-text out-cleaning">アウト清掃</span>
                 <span class="check-in-time">IN: 18:00</span>
@@ -458,7 +535,7 @@
         <!-- 未アサインの部屋 -->
         <div class="room-card out-cleaning unassigned hidden">
             <div class="assignment-badge unassigned">未割当</div>
-            <div class="room-number">105</div>
+            <div class="room-number">105 <span class="room-type">ダブル</span></div>
             <div class="room-status">
                 <span class="status-text out-cleaning">アウト清掃</span>
                 <span class="check-in-time">IN: 16:00</span>
@@ -471,7 +548,7 @@
         <!-- 他スタッフ担当の部屋 -->
         <div class="room-card out-cleaning other-assignment hidden">
             <div class="assignment-badge other">佐藤担当</div>
-            <div class="room-number">106</div>
+            <div class="room-number">106 <span class="room-type">シングル</span></div>
             <div class="room-status">
                 <span class="status-text out-cleaning">アウト清掃</span>
                 <span class="check-in-time">IN: 18:00</span>
@@ -484,7 +561,7 @@
         <!-- 他スタッフ担当の部屋（点検済） -->
         <div class="room-card inspected other-assignment hidden">
             <div class="assignment-badge other">山田担当</div>
-            <div class="room-number">107</div>
+            <div class="room-number">107 <span class="room-type">ダブル</span></div>
             <div class="room-status">
                 <span class="status-text inspected">点検済</span>
                 <span class="check-in-time">IN: 17:00</span>
@@ -492,26 +569,20 @@
             <div class="action-buttons">
                 <button class="btn" disabled>受け入れ可</button>
             </div>
-            <div class="room-time">点検完了: 12:45</div>
         </div>
 
         <!-- DD（連泊）の部屋 -->
         <div class="room-card dd-stay other-assignment hidden">
             <div class="assignment-badge other">連泊</div>
-            <div class="room-number">108</div>
+            <div class="room-number">108 <span class="room-type">シングル</span></div>
             <div class="room-status">
                 <span class="status-text dd-stay">DD</span>
-                <span class="check-in-time">連泊2日目</span>
+                <span class="check-in-time">IN: --:--</span>
             </div>
             <div class="action-buttons">
                 <button class="btn" disabled>清掃不要</button>
             </div>
         </div>
-    </div>
-
-    <div class="floating-summary">
-        <div class="summary-text">残り3部屋（予想完了時刻）</div>
-        <div class="remaining-time">14:30</div>
     </div>
 
     <script>
@@ -588,34 +659,34 @@
             document.querySelector('.summary-text').textContent = `残り${remaining}部屋（予想完了時刻）`;
         }
 
-        // 表示モード切り替え機能
-        document.querySelectorAll('.view-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                // ボタンの状態を更新
-                document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                
-                const viewMode = this.dataset.view;
-                toggleRoomView(viewMode);
-            });
-        });
-
-        function toggleRoomView(mode) {
-            const allRooms = document.querySelectorAll('.room-card');
-            const myRooms = document.querySelectorAll('.room-card.my-assignment');
-            const otherRooms = document.querySelectorAll('.room-card.unassigned, .room-card.other-assignment');
-            
-            if (mode === 'assigned') {
-                // 担当部屋のみ表示
-                myRooms.forEach(room => room.classList.remove('hidden'));
-                otherRooms.forEach(room => room.classList.add('hidden'));
-            } else {
-                // 全部屋表示
-                allRooms.forEach(room => room.classList.remove('hidden'));
-            }
-            
-            updateProgress();
-        }
+        // // 表示モード切り替え機能
+        // document.querySelectorAll('.view-btn').forEach(btn => {
+        //     btn.addEventListener('click', function() {
+        //         // ボタンの状態を更新
+        //         document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+        //         this.classList.add('active');
+        //
+        //         const viewMode = this.dataset.view;
+        //         toggleRoomView(viewMode);
+        //     });
+        // });
+        //
+        // function toggleRoomView(mode) {
+        //     const allRooms = document.querySelectorAll('.room-card');
+        //     const myRooms = document.querySelectorAll('.room-card.my-assignment');
+        //     const otherRooms = document.querySelectorAll('.room-card.unassigned, .room-card.other-assignment');
+        //
+        //     if (mode === 'assigned') {
+        //         // 担当部屋のみ表示
+        //         myRooms.forEach(room => room.classList.remove('hidden'));
+        //         otherRooms.forEach(room => room.classList.add('hidden'));
+        //     } else {
+        //         // 全部屋表示
+        //         allRooms.forEach(room => room.classList.remove('hidden'));
+        //     }
+        //
+        //     updateProgress();
+        // }
 
         // 緊急時の部屋受け取り機能
         function takeRoom(button) {
@@ -671,6 +742,22 @@
             
             console.log(`${hotelNames[hotelId]}のデータに更新しました`);
         }
+
+        // ユーザーメニュー
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('open');
+        }
+
+        // ユーザーメニュー外クリックで閉じる
+        document.addEventListener('click', function(event) {
+            const userMenu = document.querySelector('.user-menu');
+            const dropdown = document.getElementById('userDropdown');
+            
+            if (!userMenu.contains(event.target)) {
+                dropdown.classList.remove('open');
+            }
+        });
     </script>
 </body>
 </html>

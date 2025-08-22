@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabiq清掃管理画面 - 管理者</title>
+    <title>Tabiq清掃管理 - 管理者</title>
     <style>
         * {
             margin: 0;
@@ -21,10 +21,15 @@
             background-color: #fff;
             padding: 16px 20px;
             border-bottom: 1px solid #e0e0e0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        @media (min-width: 769px) {
+            .header {
+                position: sticky;
+                top: 0;
+                z-index: 100;
+            }
         }
 
         .header-content {
@@ -38,6 +43,84 @@
             font-size: 18px;
             font-weight: 600;
             color: #333;
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-button {
+            background: none;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #333;
+            transition: all 0.2s ease;
+        }
+
+        .user-button:hover {
+            background-color: #f5f5f5;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            min-width: 200px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .user-dropdown.open {
+            display: block;
+        }
+
+        .user-info {
+            padding: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .dropdown-menu {
+            padding: 8px 0;
+        }
+
+        .dropdown-item {
+            display: block;
+            width: 100%;
+            padding: 8px 16px;
+            border: none;
+            background: none;
+            text-align: left;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f5f5f5;
         }
 
         .hotel-selector {
@@ -54,23 +137,60 @@
             background-position: right 12px center;
             background-size: 16px;
             padding-right: 40px;
+            margin-bottom: 16px;
         }
 
 
         .dashboard-stats {
             background-color: #fff;
-            padding: 20px;
+            padding: 16px;
             border-bottom: 1px solid #e0e0e0;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
+            gap: 12px;
         }
 
         .stat-card {
             text-align: center;
-            padding: 16px;
+            padding: 12px 8px;
             border-radius: 8px;
             border: 2px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 44px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stat-card.active {
+            border-width: 3px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .stat-card.out-cleaning.active {
+            background-color: #ffcccb;
+            border-color: #d32f2f;
+        }
+
+        .stat-card.in-progress.active {
+            background-color: #ffe0b3;
+            border-color: #f57c00;
+        }
+
+        .stat-card.cleaned.active {
+            background-color: #bbdefb;
+            border-color: #1565c0;
+        }
+
+        .stat-card.inspected.active {
+            background-color: #c8e6c9;
+            border-color: #2e7d32;
         }
 
         .stat-card.out-cleaning {
@@ -94,13 +214,13 @@
         }
 
         .stat-number {
-            font-size: 32px;
+            font-size: 20px;
             font-weight: bold;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .stat-label {
-            font-size: 14px;
+            font-size: 12px;
             color: #666;
         }
 
@@ -117,23 +237,146 @@
         .date-navigation {
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: space-between;
+            width: 100%;
         }
 
         .date-nav-btn {
-            background: none;
+            background-color: #f8f9fa;
             border: 1px solid #e0e0e0;
-            padding: 8px 12px;
-            border-radius: 6px;
+            padding: 12px 16px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 16px;
+            color: #333;
+            min-width: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease;
+        }
+
+        .date-nav-btn:hover {
+            background-color: #e9ecef;
         }
 
         .current-date {
             font-size: 16px;
             font-weight: 500;
             color: #333;
-            padding: 8px 16px;
+            text-align: center;
+            flex: 1;
+            cursor: pointer;
+            position: relative;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+
+        .current-date:hover {
+            background-color: #f5f5f5;
+        }
+
+        .calendar-popup {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 8px;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            display: none;
+            min-width: 300px;
+        }
+
+        .calendar-popup.show {
+            display: block;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .calendar-month {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .calendar-nav {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .calendar-nav:hover {
+            background-color: #f5f5f5;
+        }
+
+        .calendar-grid {
+            padding: 16px;
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .calendar-weekday {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            padding: 8px 4px;
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+
+        .calendar-day {
+            text-align: center;
+            padding: 8px 4px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
+            min-height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .calendar-day:hover {
+            background-color: #f5f5f5;
+        }
+
+        .calendar-day.today {
+            background-color: #2196f3;
+            color: white;
+        }
+
+        .calendar-day.selected {
+            background-color: #1976d2;
+            color: white;
+        }
+
+        .calendar-day.other-month {
+            color: #ccc;
         }
 
 
@@ -227,6 +470,9 @@
             font-size: 20px;
             font-weight: bold;
             color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .room-type {
@@ -235,7 +481,9 @@
             background-color: #f0f0f0;
             padding: 2px 8px;
             border-radius: 12px;
+            font-weight: normal;
         }
+
 
         .room-status {
             font-size: 14px;
@@ -417,8 +665,22 @@
         @media (max-width: 768px) {
             .dashboard-stats {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-                padding: 16px;
+                gap: 8px;
+                padding: 12px;
+            }
+
+            .stat-card {
+                padding: 8px 4px;
+                min-height: 44px;
+            }
+
+            .stat-number {
+                font-size: 18px;
+                margin-bottom: 2px;
+            }
+
+            .stat-label {
+                font-size: 11px;
             }
 
             .room-list {
@@ -440,58 +702,354 @@
                 width: 100%;
             }
         }
+
+        /* アサインモーダルのスタイル */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .assignment-modal {
+            background-color: #fff;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .assignment-modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .assignment-modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .assignment-close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #666;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+        }
+
+        .assignment-close-btn:hover {
+            background-color: #f5f5f5;
+        }
+
+        .assignment-modal-body {
+            padding: 20px;
+        }
+
+        .assignment-room-info {
+            background-color: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .assignment-room-number {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .assignment-room-details {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .assignment-current {
+            background-color: #fff3e0;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ff9800;
+        }
+
+        .assignment-label {
+            font-size: 12px;
+            color: #ef6c00;
+            font-weight: 600;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .assignment-current-staff {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .assignment-staff-selection {
+            margin-bottom: 20px;
+        }
+
+        .assignment-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .assignment-staff-item {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: #fff;
+            margin-bottom: 12px;
+        }
+
+        .assignment-staff-item:hover {
+            border-color: #2196f3;
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.1);
+        }
+
+        .assignment-staff-item.selected {
+            border-color: #2196f3;
+            background-color: #f3f9ff;
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.2);
+        }
+
+        .assignment-staff-item.assignment-unavailable {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #f5f5f5;
+        }
+
+        .assignment-staff-item.assignment-unavailable:hover {
+            border-color: #e0e0e0;
+            box-shadow: none;
+        }
+
+        .assignment-unassign-option {
+            border: 2px solid #f44336;
+            background-color: #fff;
+        }
+
+        .assignment-unassign-option:hover {
+            background-color: #fff5f5;
+            border-color: #d32f2f;
+        }
+
+        .assignment-unassign-option.selected {
+            background-color: #ffebee;
+            border-color: #d32f2f;
+        }
+
+        .assignment-unassign-text {
+            color: #c62828;
+            font-weight: 600;
+        }
+
+        .assignment-staff-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .assignment-staff-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .assignment-staff-status {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .assignment-staff-status.assignment-available {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .assignment-staff-status.assignment-busy {
+            background-color: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .assignment-staff-status.assignment-unavailable-status {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+
+        .assignment-staff-info {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .assignment-workload {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .assignment-progress-bar {
+            background-color: #e0e0e0;
+            height: 4px;
+            border-radius: 2px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+
+        .assignment-progress-fill {
+            background-color: #4caf50;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .assignment-progress-fill.assignment-warning {
+            background-color: #ff9800;
+        }
+
+        .assignment-modal-actions {
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 12px;
+        }
+
+        .assignment-btn {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .assignment-btn-cancel {
+            background-color: #f5f5f5;
+            color: #666;
+        }
+
+        .assignment-btn-cancel:hover {
+            background-color: #e0e0e0;
+        }
+
+        .assignment-btn-assign {
+            background-color: #2196f3;
+            color: white;
+        }
+
+        .assignment-btn-assign:hover {
+            background-color: #1976d2;
+        }
+
+        .assignment-btn-assign:disabled {
+            background-color: #e0e0e0;
+            color: #9e9e9e;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="header-content">
-            <div class="header-title">Tabiq清掃管理画面 - 管理者</div>
+            <div class="header-title">Tabiq清掃管理 - 管理者</div>
+            <div class="user-menu">
+                <button class="user-button" onclick="toggleUserMenu()">
+                    <span>▼</span>
+                </button>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="user-info">
+                        <div class="user-name">田中 太郎</div>
+                        <div class="user-role">管理者</div>
+                    </div>
+                    <div class="dropdown-menu">
+                        <button class="dropdown-item">通知設定</button>
+                        <hr style="margin: 4px 0; border: none; border-top: 1px solid #e0e0e0;">
+                        <button class="dropdown-item" style="color: #c62828;">ログアウト</button>
+                    </div>
+                </div>
+            </div>
         </div>
         <select class="hotel-selector">
             <option>ホテル桜 新宿店</option>
             <option>ホテル桜 渋谷店</option>
             <option>ホテル桜 池袋店</option>
         </select>
+        <div class="date-navigation">
+            <button class="date-nav-btn" onclick="changeDate(-1)">‹</button>
+            <div class="current-date" id="currentDate" onclick="toggleCalendar()">
+                2025年08月21日
+                <div class="calendar-popup" id="calendarPopup">
+                    <div class="calendar-header">
+                        <button class="calendar-nav" onclick="event.stopPropagation(); changeCalendarMonth(-1)">‹</button>
+                        <div class="calendar-month" id="calendarMonth">2025年8月</div>
+                        <button class="calendar-nav" onclick="event.stopPropagation(); changeCalendarMonth(1)">›</button>
+                    </div>
+                    <div class="calendar-grid">
+                        <div class="calendar-weekdays">
+                            <div class="calendar-weekday">日</div>
+                            <div class="calendar-weekday">月</div>
+                            <div class="calendar-weekday">火</div>
+                            <div class="calendar-weekday">水</div>
+                            <div class="calendar-weekday">木</div>
+                            <div class="calendar-weekday">金</div>
+                            <div class="calendar-weekday">土</div>
+                        </div>
+                        <div class="calendar-days" id="calendarDays"></div>
+                    </div>
+                </div>
+            </div>
+            <button class="date-nav-btn" onclick="changeDate(1)">›</button>
+        </div>
     </div>
 
     <div class="dashboard-stats">
-        <div class="stat-card out-cleaning">
+        <div class="stat-card out-cleaning" onclick="filterByStatus('out-cleaning')">
             <div class="stat-number">4</div>
             <div class="stat-label">アウト清掃</div>
         </div>
-        <div class="stat-card in-progress">
+        <div class="stat-card in-progress" onclick="filterByStatus('in-progress')">
             <div class="stat-number">3</div>
             <div class="stat-label">清掃中</div>
         </div>
-        <div class="stat-card cleaned">
+        <div class="stat-card cleaned" onclick="filterByStatus('cleaned')">
             <div class="stat-number">2</div>
             <div class="stat-label">清掃済</div>
         </div>
-        <div class="stat-card inspected">
+        <div class="stat-card inspected" onclick="filterByStatus('inspected')">
             <div class="stat-number">6</div>
             <div class="stat-label">点検済</div>
         </div>
     </div>
 
     <div class="controls">
-        <div class="date-navigation">
-            <button class="date-nav-btn">‹</button>
-            <div class="current-date">2025年08月19日</div>
-            <button class="date-nav-btn">›</button>
-        </div>
-
-
         <div class="filters">
             <select class="filter-select">
-                <option value="">状態を選択してください</option>
-                <option>アウト清掃</option>
-                <option>清掃中</option>
-                <option>清掃済</option>
-                <option>点検済</option>
-                <option>DD</option>
-            </select>
-            <select class="filter-select">
-                <option value="">スタッフを選択してください</option>
+                <option>全スタッフ</option>
                 <option>田中 花子</option>
                 <option>佐藤 次郎</option>
                 <option>山田 太郎</option>
@@ -503,17 +1061,12 @@
         <!-- アウト清掃の部屋 -->
         <div class="room-card out-cleaning">
             <div class="room-header">
-                <div class="room-number">201</div>
-                <div class="room-type">シングル</div>
+                <div class="room-number">201 <span class="room-type">シングル</span></div>
             </div>
             <div class="room-status out-cleaning">アウト清掃</div>
             <div class="room-staff">未割り当て</div>
             <div class="room-details">
-                チェックアウト: 09:30<br>
-                次回チェックイン: 15:00
-            </div>
-            <div class="room-times">
-                推奨開始: 11:00
+                IN: 15:00
             </div>
             <div class="room-actions">
                 <button class="action-btn btn-assign">割当</button>
@@ -522,17 +1075,12 @@
 
         <div class="room-card out-cleaning">
             <div class="room-header">
-                <div class="room-number">103</div>
-                <div class="room-type">ツイン</div>
+                <div class="room-number">103 <span class="room-type">ツイン</span></div>
             </div>
             <div class="room-status out-cleaning">アウト清掃</div>
             <div class="room-staff">担当: 佐藤 次郎</div>
             <div class="room-details">
-                チェックアウト: 10:30<br>
-                次回チェックイン: 18:00
-            </div>
-            <div class="room-times">
-                推奨開始: 12:00
+                IN: 18:00
             </div>
             <div class="room-actions">
                 <button class="action-btn btn-reassign">変更</button>
@@ -542,17 +1090,12 @@
         <!-- 清掃中の部屋 -->
         <div class="room-card in-progress">
             <div class="room-header">
-                <div class="room-number">102</div>
-                <div class="room-type">シングル</div>
+                <div class="room-number">102 <span class="room-type">シングル</span></div>
             </div>
             <div class="room-status in-progress">清掃中</div>
             <div class="room-staff">担当: 田中 花子</div>
             <div class="room-details">
-                チェックアウト: 10:00<br>
-                次回チェックイン: 15:00
-            </div>
-            <div class="room-times">
-                開始: 10:30 / 予想完了: 11:30
+                IN: 15:00
             </div>
             <div class="room-actions">
                 <button class="action-btn btn-reassign">変更</button>
@@ -563,17 +1106,12 @@
         <!-- 清掃済の部屋 -->
         <div class="room-card cleaned">
             <div class="room-header">
-                <div class="room-number">104</div>
-                <div class="room-type">ダブル</div>
+                <div class="room-number">104 <span class="room-type">ダブル</span></div>
             </div>
             <div class="room-status cleaned">清掃済</div>
             <div class="room-staff">担当: 田中 花子</div>
             <div class="room-details">
-                チェックアウト: 10:00<br>
-                次回チェックイン: 15:00
-            </div>
-            <div class="room-times">
-                完了: 11:20 / 点検待ち
+                IN: 15:00
             </div>
             <div class="room-actions">
                 <button class="action-btn btn-inspect">点検</button>
@@ -583,17 +1121,12 @@
         <!-- 点検済の部屋 -->
         <div class="room-card inspected">
             <div class="room-header">
-                <div class="room-number">105</div>
-                <div class="room-type">ダブル</div>
+                <div class="room-number">105 <span class="room-type">ダブル</span></div>
             </div>
             <div class="room-status inspected">点検済</div>
             <div class="room-staff">担当: 山田 太郎</div>
             <div class="room-details">
-                チェックアウト: 09:00<br>
-                次回チェックイン: 15:00
-            </div>
-            <div class="room-times">
-                点検完了: 12:00 / 受入可: ✓
+                IN: 15:00
             </div>
             <div class="room-actions">
                 <button class="action-btn" style="background-color: #8bc34a; color: white;" disabled>受入準備完了</button>
@@ -603,17 +1136,12 @@
         <!-- DD（連泊等）の部屋 -->
         <div class="room-card dd-stay">
             <div class="room-header">
-                <div class="room-number">106</div>
-                <div class="room-type">シングル</div>
+                <div class="room-number">106 <span class="room-type">シングル</span></div>
             </div>
             <div class="room-status dd-stay">DD</div>
-            <div class="room-staff">-</div>
+            <div class="room-staff">担当: -</div>
             <div class="room-details">
-                連泊2日目<br>
-                チェックアウト予定: 10:00 (翌日)
-            </div>
-            <div class="room-times">
-                清掃不要
+                IN: --:--
             </div>
             <div class="room-actions">
                 <button class="action-btn" style="background-color: #e0e0e0; color: #666;" disabled>清掃不要</button>
@@ -665,10 +1193,25 @@
         });
 
 
-        // アクションボタン
-        document.querySelectorAll('.btn-assign').forEach(btn => {
-            btn.addEventListener('click', function() {
-                alert('スタッフ割り当て画面を表示');
+        // アクションボタン - イベント委譲を使用して動的に追加される要素にも対応
+        document.addEventListener('click', function(event) {
+            console.log('クリックイベント発生:', event.target, event.target.classList);
+            
+            if (event.target.classList.contains('btn-assign')) {
+                console.log('btn-assignボタンがクリックされました');
+                const roomCard = event.target.closest('.room-card');
+                const roomNumber = roomCard.querySelector('.room-number').textContent.split(' ')[0];
+                const roomType = roomCard.querySelector('.room-type').textContent;
+                showAssignmentModal(roomNumber, roomType);
+            }
+        });
+        
+        // ページ読み込み後に割当ボタンが存在するか確認
+        document.addEventListener('DOMContentLoaded', function() {
+            const assignButtons = document.querySelectorAll('.btn-assign');
+            console.log('割当ボタンの数:', assignButtons.length);
+            assignButtons.forEach((btn, index) => {
+                console.log(`ボタン${index + 1}:`, btn, btn.textContent);
             });
         });
 
@@ -693,7 +1236,346 @@
             });
         });
 
+        // ユーザーメニュー
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('open');
+        }
 
-    </script>
+        // ユーザーメニュー外クリックで閉じる
+        document.addEventListener('click', function(event) {
+            const userMenu = document.querySelector('.user-menu');
+            const dropdown = document.getElementById('userDropdown');
+            
+            if (!userMenu.contains(event.target)) {
+                dropdown.classList.remove('open');
+            }
+        });
+
+        // 統計カードでの絞り込み機能
+        let currentFilter = null;
+
+        function filterByStatus(status) {
+            const statCards = document.querySelectorAll('.stat-card');
+            const roomCards = document.querySelectorAll('.room-card');
+
+            // 既に選択されているフィルターと同じ場合はリセット
+            if (currentFilter === status) {
+                currentFilter = null;
+                statCards.forEach(card => card.classList.remove('active'));
+                roomCards.forEach(card => card.style.display = 'block');
+                console.log('フィルターをリセットしました');
+                return;
+            }
+
+            // 新しいフィルターを適用
+            currentFilter = status;
+            
+            // 統計カードのアクティブ状態を更新
+            statCards.forEach(card => card.classList.remove('active'));
+            document.querySelector(`.stat-card.${status}`).classList.add('active');
+            
+            // 部屋カードのフィルタリング
+            roomCards.forEach(card => {
+                if (card.classList.contains(status)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            console.log(`${status}でフィルタリングしました`);
+        }
+
+        // 日付管理
+        let currentDate = new Date(2025, 7, 21); // 2025年8月21日
+
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}年${month}月${day}日`;
+        }
+
+        function changeDate(direction) {
+            currentDate.setDate(currentDate.getDate() + direction);
+            updateDateDisplay();
+        }
+
+        function updateDateDisplay() {
+            const dateText = formatDate(currentDate);
+            const currentDateElement = document.getElementById('currentDate');
+            // テキストノードのみ更新（カレンダーポップアップは保持）
+            currentDateElement.childNodes[0].textContent = dateText + ' ';
+            updateCalendarMonth();
+            console.log('日付を更新しました:', dateText);
+        }
+
+        function toggleCalendar() {
+            const popup = document.getElementById('calendarPopup');
+            popup.classList.toggle('show');
+            if (popup.classList.contains('show')) {
+                generateCalendar();
+            }
+        }
+
+        function changeCalendarMonth(direction) {
+            const calendarDate = new Date(currentDate);
+            calendarDate.setMonth(calendarDate.getMonth() + direction);
+            currentDate = calendarDate;
+            updateCalendarMonth();
+            generateCalendar();
+            // カレンダーを開いたまま保持
+            document.getElementById('calendarPopup').classList.add('show');
+        }
+
+        function updateCalendarMonth() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth() + 1;
+            document.getElementById('calendarMonth').textContent = `${year}年${month}月`;
+        }
+
+        function generateCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const today = new Date();
+            
+            // 月の最初の日と最後の日
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            
+            // カレンダーの開始日（日曜日から）
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+            
+            const calendarDays = document.getElementById('calendarDays');
+            calendarDays.innerHTML = '';
+            
+            // 6週間分の日付を生成
+            for (let i = 0; i < 42; i++) {
+                const date = new Date(startDate);
+                date.setDate(startDate.getDate() + i);
+                
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = date.getDate();
+                
+                // 他の月の日付はグレーアウト
+                if (date.getMonth() !== month) {
+                    dayElement.classList.add('other-month');
+                }
+                
+                // 今日の日付をハイライト
+                if (date.toDateString() === today.toDateString()) {
+                    dayElement.classList.add('today');
+                }
+                
+                // 選択された日付をハイライト
+                if (date.toDateString() === currentDate.toDateString()) {
+                    dayElement.classList.add('selected');
+                }
+                
+                dayElement.onclick = (event) => {
+                    event.stopPropagation();
+                    selectDate(date);
+                };
+                calendarDays.appendChild(dayElement);
+            }
+        }
+
+        function selectDate(date) {
+            currentDate = new Date(date);
+            updateDateDisplay();
+            document.getElementById('calendarPopup').classList.remove('show');
+        }
+
+        // カレンダー外クリックで閉じる
+        document.addEventListener('click', function(event) {
+            const currentDateElement = document.getElementById('currentDate');
+            const popup = document.getElementById('calendarPopup');
+            
+            if (!currentDateElement.contains(event.target)) {
+                popup.classList.remove('show');
+            }
+        });
+
+        // アサインモーダル機能
+        function showAssignmentModal(roomNumber, roomType, currentStaff = null) {
+            console.log('アサインモーダルを開きます:', roomNumber, roomType);
+            // モーダルHTML を動的に作成
+            const modalHtml = `
+                <div class="modal-overlay" id="assignmentModal" onclick="closeAssignmentModal(event)">
+                    <div class="assignment-modal" onclick="event.stopPropagation()">
+                        <div class="assignment-modal-header">
+                            <div class="assignment-modal-title">スタッフアサイン</div>
+                            <button class="assignment-close-btn" onclick="closeAssignmentModal()">&times;</button>
+                        </div>
+
+                        <div class="assignment-modal-body">
+                            <!-- 部屋情報 -->
+                            <div class="assignment-room-info">
+                                <div class="assignment-room-number">${roomNumber} <span style="font-size: 14px; color: #666;">${roomType}</span></div>
+                                <div class="assignment-room-details">
+                                    チェックイン: 15:00<br>
+                                    清掃状態: アウト清掃<br>
+                                    推奨完了時刻: 14:30
+                                </div>
+                            </div>
+
+                            <!-- 現在の担当者 -->
+                            <div class="assignment-current">
+                                <div class="assignment-label">現在の担当者</div>
+                                <div class="assignment-current-staff">${currentStaff || '未割り当て'}</div>
+                            </div>
+
+                            <!-- スタッフ選択 -->
+                            <div class="assignment-staff-selection">
+                                <div class="assignment-section-title">担当者を選択</div>
+                                
+                                <div class="assignment-staff-item assignment-unassign-option" data-staff="unassign">
+                                    <div class="assignment-staff-header">
+                                        <div class="assignment-staff-name assignment-unassign-text">担当解除</div>
+                                    </div>
+                                    <div class="assignment-staff-info assignment-unassign-text">この部屋の担当者を解除します</div>
+                                </div>
+
+                                <div class="assignment-staff-item" data-staff="tanaka">
+                                    <div class="assignment-staff-header">
+                                        <div class="assignment-staff-name">田中 花子</div>
+                                        <div class="assignment-staff-status assignment-available">対応可能</div>
+                                    </div>
+                                    <div class="assignment-staff-info">
+                                        担当部屋: 3部屋 (2部屋完了)<br>
+                                        予想完了: 14:00
+                                    </div>
+                                    <div class="assignment-workload">
+                                        作業負荷: 60%
+                                        <div class="assignment-progress-bar">
+                                            <div class="assignment-progress-fill" style="width: 60%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="assignment-staff-item" data-staff="sato">
+                                    <div class="assignment-staff-header">
+                                        <div class="assignment-staff-name">佐藤 次郎</div>
+                                        <div class="assignment-staff-status assignment-busy">多忙</div>
+                                    </div>
+                                    <div class="assignment-staff-info">
+                                        担当部屋: 5部屋 (1部屋完了)<br>
+                                        予想完了: 16:30
+                                    </div>
+                                    <div class="assignment-workload">
+                                        作業負荷: 85%
+                                        <div class="assignment-progress-bar">
+                                            <div class="assignment-progress-fill assignment-warning" style="width: 85%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="assignment-staff-item" data-staff="yamada">
+                                    <div class="assignment-staff-header">
+                                        <div class="assignment-staff-name">山田 太郎</div>
+                                        <div class="assignment-staff-status assignment-available">対応可能</div>
+                                    </div>
+                                    <div class="assignment-staff-info">
+                                        担当部屋: 2部屋 (2部屋完了)<br>
+                                        予想完了: 12:30
+                                    </div>
+                                    <div class="assignment-workload">
+                                        作業負荷: 40%
+                                        <div class="assignment-progress-bar">
+                                            <div class="assignment-progress-fill" style="width: 40%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="assignment-staff-item assignment-unavailable" data-staff="suzuki">
+                                    <div class="assignment-staff-header">
+                                        <div class="assignment-staff-name">鈴木 美咲</div>
+                                        <div class="assignment-staff-status assignment-unavailable-status">欠勤</div>
+                                    </div>
+                                    <div class="assignment-staff-info">
+                                        本日は出勤していません
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="assignment-modal-actions">
+                            <button class="assignment-btn assignment-btn-cancel" onclick="closeAssignmentModal()">キャンセル</button>
+                            <button class="assignment-btn assignment-btn-assign" id="assignmentAssignBtn" onclick="executeAssignment()" disabled>アサイン</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 既存のモーダルを削除
+            const existingModal = document.getElementById('assignmentModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // 新しいモーダルを追加
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // イベントリスナーを設定
+            setupAssignmentModal(roomNumber, roomType);
+        }
+
+        function setupAssignmentModal(roomNumber, roomType) {
+            let selectedStaff = null;
+            
+            // スタッフ選択機能
+            document.querySelectorAll('.assignment-staff-item:not(.assignment-unavailable)').forEach(item => {
+                item.addEventListener('click', function() {
+                    // 前の選択を解除
+                    document.querySelectorAll('.assignment-staff-item').forEach(i => i.classList.remove('selected'));
+                    
+                    // 新しい選択を設定
+                    this.classList.add('selected');
+                    selectedStaff = this.dataset.staff;
+                    
+                    // アサインボタンを有効化
+                    const assignBtn = document.getElementById('assignmentAssignBtn');
+                    assignBtn.disabled = false;
+                    assignBtn.textContent = selectedStaff === 'unassign' ? '担当解除' : 'アサイン';
+                });
+            });
+            
+            // アサイン実行
+            window.executeAssignment = function() {
+                if (!selectedStaff) return;
+                
+                if (selectedStaff === 'unassign') {
+                    if (confirm(`部屋${roomNumber}の担当を解除しますか？`)) {
+                        console.log(`部屋${roomNumber}の担当を解除しました`);
+                        closeAssignmentModal();
+                    }
+                } else {
+                    const staffNames = {
+                        'tanaka': '田中 花子',
+                        'sato': '佐藤 次郎', 
+                        'yamada': '山田 太郎'
+                    };
+                    
+                    const staffName = staffNames[selectedStaff];
+                    if (confirm(`部屋${roomNumber}を${staffName}に割り当てますか？`)) {
+                        console.log(`部屋${roomNumber}を${staffName}にアサインしました`);
+                        closeAssignmentModal();
+                    }
+                }
+            };
+        }
+
+        function closeAssignmentModal(event) {
+            // モーダル内をクリックした場合は閉じない
+            if (event && event.target !== event.currentTarget) return;
+            
+            const modal = document.getElementById('assignmentModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
 </body>
 </html>
